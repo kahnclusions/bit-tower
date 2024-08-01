@@ -14,12 +14,21 @@ leptos_axum = { workspace = true, optional = true }
 http.workspace = true
 cfg-if.workspace = true
 thiserror.workspace = true
+tracing.workspace = true
+serde.workspace = true
 
 wasm-bindgen = { version = "0.2", optional = true }
 wasm-bindgen-futures = { version = "0.4.42", optional = true }
 
+fnord-ui = { path = "../fnord_ui", default-features = false, optional = true }
+qbittorrent-rs = { path = "../qbittorrent_rs", optional = true }
+qbittorrent-rs-proto = { path = "../qbittorrent_rs_proto" }
+simple_crypt = { version = "0.2.3", optional = true }
+bincode      = { version = "1.3.3", optional = true }
+base64       = { version = "0.22.1", optional = true }
+
 [features]
 default = []
-hydrate = ["leptos/hydrate", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]
-ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"]
+hydrate = ["leptos/hydrate", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "fnord-ui/hydrate"]
+ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum", "dep:simple_crypt", "dep:bincode", "dep:base64", "fnord-ui/ssr", "qbittorrent-rs"]
 

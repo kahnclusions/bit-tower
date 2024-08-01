@@ -126,8 +126,10 @@ html, body {
  
   @media (prefers-color-scheme: dark) {
     :root {
-      --background: 224 71% 4%;
-      --foreground: 213 31% 91%;
+      --background: 230 24% 19%;
+      --background-highlight: 228 23% 21%; 
+      --background-dark: 229 26% 16%;
+      --foreground: 229 73% 86%;
    
       --muted: 223 47% 11%;
       --muted-foreground: 215.4 16.3% 56.9%;
@@ -156,6 +158,10 @@ html, body {
       --ring: 216 34% 17%;
    
       --radius: 0.5rem;
+
+      --green-1: 89 51% 61%;
+      --green-2: 171 58% 65%;
+      --green-3: 188 47% 48%;
     }
   }
 }

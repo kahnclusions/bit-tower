@@ -1,8 +1,13 @@
+mod auth;
+mod routes;
+
 use crate::error_template::{AppError, ErrorTemplate};
 
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
+
+use fnord_ui::components::{Navbar, NavbarBrand};
 
 pub mod error_template;
 
@@ -33,11 +38,14 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="leptos" href="/pkg/bittower.css"/>
 
         // sets the document title
-        <Title text="Welcome to Leptos"/>
+        <Title text="bit-tower"/>
 
         // content for this welcome page
         <Router>
-            <main>
+            <Navbar>
+                <NavbarBrand>"bit-tower"</NavbarBrand>
+            </Navbar>
+            <main class="pt-9">
                 <FlatRoutes fallback=|| {
 
             let mut outside_errors = Errors::default();
