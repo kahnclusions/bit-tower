@@ -1,9 +1,10 @@
-mod auth;
+pub mod auth;
 mod routes;
 
 use crate::error_template::{AppError, ErrorTemplate};
 
-use leptos::prelude::*;
+use auth::{has_auth, Login};
+use leptos::{either::Either, prelude::*};
 use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
 
@@ -22,7 +23,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <HydrationScripts options/>
                 <MetaTags />
             </head>
-            <body class="bg-white text-slate-950 dark:bg-slate-950 dark:text-white">
+            <body class="bg-background text-foreground ">
                 <App />
             </body>
         </html>
@@ -34,6 +35,10 @@ pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
+    let login = ServerAction::<Login>::new();
+    let is_auth = Resource::new(move || login.version(), move |_| has_auth());
+    let auth = Signal::derive(move || is_auth.get().map(|v| v.unwrap_or(false)).unwrap_or(false));
+
     view! {
         <Stylesheet id="leptos" href="/pkg/bittower.css"/>
 
@@ -43,16 +48,19 @@ pub fn App() -> impl IntoView {
         // content for this welcome page
         <Router>
             <Navbar>
-                <NavbarBrand>"bit-tower"</NavbarBrand>
+                <NavbarBrand class="font-display">"bit-tower"</NavbarBrand>
+                <ul class="p-2 font-cubic">
+                    <A href="/login">login</A>
+                </ul>
             </Navbar>
-            <main class="pt-9">
+            <main class="pt-9 bg-background">
                 <FlatRoutes fallback=|| {
 
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
             view! { <ErrorTemplate outside_errors/> }.into_view()
         }>
-                    <Route path=StaticSegment("") view=HomePage/>
+                    <Route path=StaticSegment("") view=move || view! { <HomePage is_auth=auth action=login /> } />
                 </FlatRoutes>
             </main>
         </Router>
@@ -61,13 +69,39 @@ pub fn App() -> impl IntoView {
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage() -> impl IntoView {
-    // Creates a reactive value to update the button
-    let (count, set_count) = signal(0);
-    let on_click = move |_| set_count.update(|count| *count += 1);
+fn HomePage(is_auth: Signal<bool>, action: ServerAction<Login>) -> impl IntoView {
+    let res = move || {
+        if is_auth() {
+            Either::Left(view! {
+                <div>"Hello"</div>
+            })
+        } else {
+            Either::Right(view! {
+                <ActionForm action=action>
+                    <h1>"Log In"</h1>
+                    <label>
+                        "User ID:"
+                        <input
+                            type="text"
+                            placeholder="User ID"
+                            maxlength="32"
+                            name="username"
+                            class="auth-input"
+                        />
+                    </label>
+                    <label>
+                        "Password:"
+                        <input type="password" placeholder="Password" name="password" class="auth-input"/>
+                    </label>
+                    <button type="submit" class="button">
+                        "Log In"
+                    </button>
+                </ActionForm>
+            })
+        }
+    };
 
     view! {
-        <h1 class="font-bold">"Welcome to Leptos!"</h1>
-        <button on:click=on_click>"Click Me: " {count}</button>
+       <div>{res()}</div>
     }
 }

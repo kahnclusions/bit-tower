@@ -92,8 +92,10 @@ html, body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    --background: 230 11% 89%;
+    --background-dark: 226, 44%, 80%; 
+    --background-highlight: 229, 23%, 81%;
+    --foreground: 222 55% 48%;
  
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;

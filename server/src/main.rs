@@ -1,11 +1,13 @@
 use app::*;
+use auth::ssr::{AuthSession, Session, AUTH_COOKIE};
 use axum::{
     body::Body,
     extract::{FromRef, Path, Request, State},
-    http::header::CONTENT_TYPE,
-    response::IntoResponse,
+    http::header::{self, CONTENT_TYPE},
+    middleware::{self, Next},
+    response::{IntoResponse, Response},
     routing::{get, post},
-    Router, ServiceExt,
+    Extension, Router, ServiceExt,
 };
 use fileserv::file_and_error_handler;
 use leptos::prelude::*;
@@ -35,7 +37,7 @@ async fn main() {
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
 
-    let qbt = QbtClient::new("http://localhost:9090");
+    let qbt = QbtClient::new("http://localhost:9090/api/v2");
     let qbt_routes = qbt.clone();
 
     let (routes, _static_data_map) =
@@ -57,6 +59,7 @@ async fn main() {
         )
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
+        .layer(middleware::from_fn(session_middleware))
         .with_state(app_state);
 
     // run our app with hyper
@@ -68,9 +71,38 @@ async fn main() {
         .unwrap();
 }
 
+async fn session_middleware(mut request: Request, next: Next) -> Response {
+    let res = request
+        .headers()
+        .get_all(header::COOKIE)
+        .into_iter()
+        .find_map(|x| {
+            let cs = cookie::Cookie::split_parse(x.to_str().unwrap());
+            let token = cs
+                .into_iter()
+                .find(|c| match c {
+                    Ok(c) => c.name() == AUTH_COOKIE,
+                    _ => false,
+                })
+                .map(|c| c.unwrap().value().to_string());
+            token
+        });
+    request.extensions_mut().insert(AuthSession::new(None));
+    if let Some(sealed_token) = res {
+        let session = app::auth::ssr::get_session(sealed_token).ok();
+        if let Some(session) = session {
+            request
+                .extensions_mut()
+                .insert(AuthSession::new(Some(session)));
+        }
+    }
+    next.run(request).await
+}
+
 /// Creates an axum handler to inject context into server functions.
 async fn server_fn_handler(
     State(app_state): State<AppState>,
+    Extension(auth_session): Extension<AuthSession>,
     path: Path<String>,
     request: Request<Body>,
 ) -> impl IntoResponse {
@@ -78,6 +110,9 @@ async fn server_fn_handler(
     handle_server_fns_with_context(
         move || {
             provide_context::<QbtClient>(app_state.qbt.clone());
+            if let Some(session) = &auth_session.session {
+                provide_context::<Session>(session.clone());
+            }
         },
         request,
     )
@@ -86,11 +121,15 @@ async fn server_fn_handler(
 
 pub async fn leptos_routes_handler(
     State(app_state): State<AppState>,
+    Extension(auth_session): Extension<AuthSession>,
     request: Request<Body>,
 ) -> axum::response::Response {
     let handler = leptos_axum::render_app_to_stream_with_context(
         move || {
             provide_context::<QbtClient>(app_state.qbt.clone());
+            if let Some(session) = &auth_session.session {
+                provide_context::<Session>(session.clone());
+            }
         },
         {
             let leptos_options = app_state.leptos_options.clone();

@@ -46,16 +46,22 @@ impl QbtClient {
 
     #[tracing::instrument]
     pub async fn auth_login(&self, username: String, password: String) -> Result<String, QbtError> {
-        let url = format!("{}{}{}", self.base_url, TORRENTS_API, INFO_API);
+        tracing::info!("Going to do login");
+        let url = format!("{}/auth/login", self.base_url);
         let client = reqwest::Client::builder().build()?;
 
         let params = [("username", username), ("password", password)];
         let response = client.post(url).form(&params).send().await?;
+        let cookies: Vec<_> = response.cookies().collect();
+        let status = response.status();
 
-        let Some(sid) = response.cookies().find(|c| c.name() == "SID") else {
+        tracing::info!(cookies = ?cookies, status = ?status);
+
+        let Some(sid) = cookies.into_iter().find(|c| c.name() == "SID") else {
             return Err(QbtError::Unauthenticated);
         };
 
+        tracing::info!("Login success");
         Ok(sid.value().to_owned())
     }
 
