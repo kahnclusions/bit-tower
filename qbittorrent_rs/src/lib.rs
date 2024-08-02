@@ -1,4 +1,5 @@
 use http::header::COOKIE;
+use reqwest::Response;
 use serde_json::Value;
 
 use qbittorrent_rs_proto::sync::{MainData, SyncMainDataFull, SyncMainDataPartial};
@@ -32,6 +33,18 @@ impl QbtClient {
     }
 
     #[tracing::instrument]
+    async fn get(&self, sid: String, path: String) -> Result<Response, reqwest::Error> {
+        let url = format!("{}{}", self.base_url, path);
+        let client = reqwest::Client::builder().build()?;
+
+        client
+            .get(url)
+            .header(COOKIE, format!("SID={}", sid).to_string())
+            .send()
+            .await
+    }
+
+    #[tracing::instrument]
     pub async fn auth_login(&self, username: String, password: String) -> Result<String, QbtError> {
         let url = format!("{}{}{}", self.base_url, TORRENTS_API, INFO_API);
         let client = reqwest::Client::builder().build()?;
@@ -47,24 +60,15 @@ impl QbtClient {
     }
 
     #[tracing::instrument]
-    pub async fn torrents_info(&self, sid: String) -> Result<Vec<TorrentSummary>, reqwest::Error> {
-        let url = format!("{}{}{}", self.base_url, TORRENTS_API, INFO_API);
-        let client = reqwest::Client::builder().build()?;
+    pub async fn torrents_info(&self, sid: String) -> Result<Vec<TorrentSummary>, QbtError> {
+        let url = format!("{}{}", TORRENTS_API, INFO_API);
+        let response = self.get(sid, url);
 
-        // let cookie: Cookie = Cookie::build(("SID", sid)).build();
-
-        // Make an initial request to set some cookies
-        let response = client
-            .get(url)
-            .header(COOKIE, format!("SID={}", sid).to_string())
-            .send()
-            .await?;
-
-        response.json().await
+        Ok(response.await?.json().await?)
     }
 
     #[tracing::instrument]
-    pub async fn sync_maindata(&self, sid: String, rid: u64) -> Result<MainData, reqwest::Error> {
+    pub async fn sync_maindata(&self, sid: String, rid: u64) -> Result<MainData, QbtError> {
         let url = format!("{}{}{}?rid={}", self.base_url, SYNC_API, MAINDATA_API, rid);
         let client = reqwest::Client::builder().build()?;
 
