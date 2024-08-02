@@ -19,6 +19,6 @@ jobs:
     - name: Install
       run: cargo install cargo-leptos
     - name: Build
-      run: cargo leptos build --verbose
+      run: cargo leptos build -vv
     - name: Run tests
       run: cargo test --verbose
