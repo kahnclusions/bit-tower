@@ -1,5 +1,6 @@
 use app::*;
 use auth::ssr::{AuthSession, Session, AUTH_COOKIE};
+use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::{
     body::Body,
     extract::{FromRef, Path, Request, State},
@@ -10,6 +11,7 @@ use axum::{
     Extension, Router, ServiceExt,
 };
 use fileserv::file_and_error_handler;
+use futures::stream::Stream;
 use leptos::prelude::*;
 use leptos_axum::{
     generate_route_list, generate_route_list_with_exclusions_and_ssg_and_context,
@@ -57,6 +59,7 @@ async fn main() {
             "/api/*fn_name",
             get(server_fn_handler).post(server_fn_handler),
         )
+        .route("/sse", get(handle_sse))
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
         .layer(middleware::from_fn(session_middleware))
@@ -138,4 +141,26 @@ pub async fn leptos_routes_handler(
     );
 
     handler(request).await.into_response()
+}
+
+async fn handle_sse() -> Sse<impl Stream<Item = Result<Event, axum::BoxError>>> {
+    use futures::stream;
+    use leptos_sse::ServerSentEvents;
+    use std::time::Duration;
+    use tokio_stream::StreamExt as _;
+
+    tracing::info!("Starting up a stream!");
+
+    let mut value = 0;
+    let stream = ServerSentEvents::new(
+        "counter",
+        stream::repeat_with(move || {
+            let curr = value;
+            value += 1;
+            Ok(Count { value: curr })
+        })
+        .throttle(Duration::from_secs(1)),
+    )
+    .unwrap();
+    Sse::new(stream).keep_alive(KeepAlive::default())
 }

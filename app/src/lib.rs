@@ -9,6 +9,8 @@ use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
 
 use fnord_ui::components::{Navbar, NavbarBrand};
+use leptos_sse::sse_signal;
+use serde::{Deserialize, Serialize};
 
 pub mod error_template;
 
@@ -73,7 +75,7 @@ fn HomePage(is_auth: Signal<bool>, action: ServerAction<Login>) -> impl IntoView
     let res = move || {
         if is_auth() {
             Either::Left(view! {
-                <div>"Hello"</div>
+                <div><Dashboard /></div>
             })
         } else {
             Either::Right(view! {
@@ -104,4 +106,21 @@ fn HomePage(is_auth: Signal<bool>, action: ServerAction<Login>) -> impl IntoView
     view! {
        <div>{res()}</div>
     }
+}
+
+#[component]
+fn Dashboard() -> impl IntoView {
+    // Provide websocket connection
+    // leptos_sse::provide_sse("http://localhost:3000/sse").unwrap();
+
+    // Create sse signal
+    let count = sse_signal::<Count>("http://localhost:3010/sse");
+    view! {
+        <div>Count: {move || { view! { <span>{count.get().value.to_string()}</span>}}}</div>
+    }
+}
+
+#[derive(Clone, Default, Serialize, Deserialize)]
+pub struct Count {
+    pub value: i32,
 }

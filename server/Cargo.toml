@@ -12,9 +12,12 @@ leptos_axum.workspace = true
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["fmt"] }
 qbittorrent-rs = { path = "../qbittorrent_rs" }
+leptos_sse = { path = "../leptos_sse", features = ["ssr"] }
 
 axum.workspace = true
 tokio.workspace = true
 tower.workspace = true
 tower-http.workspace = true
 cookie = { version = "0.18.1", features = ["secure"] }
+futures = "0.3.30"
+tokio-stream = "0.1.15"
