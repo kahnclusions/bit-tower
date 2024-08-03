@@ -76,7 +76,6 @@ impl QbtClient {
     #[tracing::instrument]
     pub async fn sync_maindata(&self, sid: String, rid: u64) -> Result<MainData, QbtError> {
         let url = format!("{}{}{}?rid={}", self.base_url, SYNC_API, MAINDATA_API, rid);
-        tracing::info!(url = ?url);
         let client = reqwest::Client::builder().build()?;
 
         let response = client

@@ -1,25 +1,11 @@
-use core::panic;
-
 use anyhow::anyhow;
-use axum::http::StatusCode;
 use axum::response::sse::{Event, KeepAlive, Sse};
-use axum::{
-    body::Body,
-    extract::{FromRef, Path, Request, State},
-    http::header::{self, CONTENT_TYPE},
-    middleware::{self, Next},
-    response::{IntoResponse, Response},
-    routing::{get, post},
-    Extension, Router, ServiceExt,
-};
 use futures::stream;
 use futures::stream::Stream;
-use futures::{TryStream, TryStreamExt};
+use futures::TryStreamExt;
 use leptos::prelude::*;
 use qbittorrent_rs::QbtClient;
-use qbittorrent_rs_proto::sync::{MainData, SyncMainDataFull};
-use qbittorrent_rs_proto::transfer::ServerStateFull;
-use serde::{Deserialize, Serialize};
+use qbittorrent_rs_proto::sync::MainData;
 use std::time::Duration;
 use tokio_stream::StreamExt as _;
 

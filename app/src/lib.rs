@@ -1,9 +1,12 @@
 pub mod auth;
 mod routes;
 
+mod components;
+
 use crate::error_template::{AppError, ErrorTemplate};
 
 use auth::{has_auth, Login};
+use components::status_bar::StatusBar;
 use leptos::{either::Either, prelude::*};
 use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
@@ -115,12 +118,13 @@ fn Dashboard() -> impl IntoView {
     use qbittorrent_rs_sse::sse_sync_maindata;
     // Create sse signal
     let data = sse_sync_maindata("/sse");
+    let server_data = data.clone();
+    let server_state = Signal::derive(move || server_data().server_state);
 
     view! {
-        <div>Count: {move || { view! { <div>
-            <div>"DL: "{data().server_state.dl_info_speed.to_string()}</div>
-            <div>"UP: "{data().server_state.up_info_speed.to_string()}</div>
-            <div>"Status: "{data().server_state.connection_status.to_string()}</div>
-            </div> }}}</div>
+        <div>
+        <div>"Torrent list will go here"</div>
+        <StatusBar server_state=server_state />
+        </div>
     }
 }
