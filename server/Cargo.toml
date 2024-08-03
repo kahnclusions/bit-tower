@@ -25,3 +25,11 @@ serde_json.workspace = true
 cookie = { version = "0.18.1", features = ["secure"] }
 futures = "0.3.30"
 tokio-stream = "0.1.15"
+lazy_static = "1.4.0"
+rust-embed = { version = "8", features = [
+  "axum",
+  "compression",
+  "mime_guess",
+  "tokio",
+] }
+mime_guess = "2.0.4" 

@@ -26,7 +26,7 @@ thiserror = "1"
 tracing = { version = "0.1" }
 tokio = { version = "1.33.0", features = ["full"] }
 tower = { version = "0.4.13", features = ["full"] }
-tower-http = { version = "0.5", features = ["full"] }
+tower-http = { version = "0.5", features = ["fs", "compression-gzip", "compression-br"] }
 uuid = { version = "1.9.0", features = [
     "v4",
     "serde",
@@ -53,7 +53,7 @@ lib-package = "frontend"
 
 # The site root folder is where cargo-leptos generate all output. WARNING: all content of this folder will be erased on a rebuild. Use it in your server setup.
 site-root = "target/site"
-hash-files = false
+hash-files = true
 
 # The site-root relative folder where all compiled output (JS, WASM and CSS) is written
 # Defaults to pkg

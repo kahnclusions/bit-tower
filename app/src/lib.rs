@@ -114,7 +114,7 @@ fn Dashboard() -> impl IntoView {
 
     use qbittorrent_rs_sse::sse_sync_maindata;
     // Create sse signal
-    let data = sse_sync_maindata("http://localhost:3010/sse");
+    let data = sse_sync_maindata("/sse");
 
     view! {
         <div>Count: {move || { view! { <div>
