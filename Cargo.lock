@@ -141,10 +141,11 @@ dependencies = [
  "leptos_axum",
  "leptos_meta",
  "leptos_router",
- "leptos_sse",
  "qbittorrent-rs",
  "qbittorrent-rs-proto",
+ "qbittorrent-rs-sse",
  "serde",
+ "serde_json",
  "simple_crypt",
  "thiserror",
  "tracing",
@@ -1651,26 +1652,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "leptos_sse"
-version = "0.4.0"
-dependencies = [
- "axum",
- "cfg-if",
- "futures",
- "js-sys",
- "json-patch",
- "leptos",
- "pin-project-lite",
- "serde",
- "serde_json",
- "tokio",
- "tokio-stream",
- "tracing",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.155"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2167,6 +2148,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "qbittorrent-rs-sse"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "cfg-if",
+ "futures",
+ "js-sys",
+ "json-patch",
+ "leptos",
+ "pin-project-lite",
+ "qbittorrent-rs",
+ "qbittorrent-rs-proto",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-stream",
+ "tracing",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2594,14 +2598,18 @@ dependencies = [
 name = "server"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "app",
  "axum",
  "cookie",
  "futures",
  "leptos",
  "leptos_axum",
- "leptos_sse",
  "qbittorrent-rs",
+ "qbittorrent-rs-proto",
+ "qbittorrent-rs-sse",
+ "serde",
+ "serde_json",
  "tokio",
  "tokio-stream",
  "tower",

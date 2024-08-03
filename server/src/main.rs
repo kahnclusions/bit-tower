@@ -1,21 +1,23 @@
+use core::panic;
+
 use app::*;
 use auth::ssr::{AuthSession, Session, AUTH_COOKIE};
-use axum::response::sse::{Event, KeepAlive, Sse};
+use axum::response::sse::{Event, Sse};
 use axum::{
     body::Body,
     extract::{FromRef, Path, Request, State},
-    http::header::{self, CONTENT_TYPE},
+    http::header,
     middleware::{self, Next},
     response::{IntoResponse, Response},
-    routing::{get, post},
-    Extension, Router, ServiceExt,
+    routing::get,
+    Extension, Router,
 };
 use fileserv::file_and_error_handler;
 use futures::stream::Stream;
 use leptos::prelude::*;
 use leptos_axum::{
-    generate_route_list, generate_route_list_with_exclusions_and_ssg_and_context,
-    handle_server_fns_with_context, AxumRouteListing, LeptosRoutes,
+    generate_route_list_with_exclusions_and_ssg_and_context, handle_server_fns_with_context,
+    AxumRouteListing, LeptosRoutes,
 };
 use qbittorrent_rs::QbtClient;
 
@@ -143,24 +145,13 @@ pub async fn leptos_routes_handler(
     handler(request).await.into_response()
 }
 
-async fn handle_sse() -> Sse<impl Stream<Item = Result<Event, axum::BoxError>>> {
-    use futures::stream;
-    use leptos_sse::ServerSentEvents;
-    use std::time::Duration;
-    use tokio_stream::StreamExt as _;
+async fn handle_sse(
+    State(app_state): State<AppState>,
+    Extension(auth_session): Extension<AuthSession>,
+) -> Sse<impl Stream<Item = Result<Event, axum::BoxError>>> {
+    let Some(session) = auth_session.session else {
+        panic!("Unauthenticated");
+    };
 
-    tracing::info!("Starting up a stream!");
-
-    let mut value = 0;
-    let stream = ServerSentEvents::new(
-        "counter",
-        stream::repeat_with(move || {
-            let curr = value;
-            value += 1;
-            Ok(Count { value: curr })
-        })
-        .throttle(Duration::from_secs(1)),
-    )
-    .unwrap();
-    Sse::new(stream).keep_alive(KeepAlive::default())
+    qbittorrent_rs_sse::handle_sse(app_state.qbt.clone(), session.sid).await
 }

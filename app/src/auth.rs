@@ -33,7 +33,7 @@ pub mod ssr {
 
     #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
     pub struct Session {
-        sid: String,
+        pub sid: String,
     }
     impl Session {
         pub fn new(sid: String) -> Self {

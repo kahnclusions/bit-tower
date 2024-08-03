@@ -9,7 +9,6 @@ use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
 
 use fnord_ui::components::{Navbar, NavbarBrand};
-use leptos_sse::sse_signal;
 use serde::{Deserialize, Serialize};
 
 pub mod error_template;
@@ -113,14 +112,15 @@ fn Dashboard() -> impl IntoView {
     // Provide websocket connection
     // leptos_sse::provide_sse("http://localhost:3000/sse").unwrap();
 
+    use qbittorrent_rs_sse::sse_sync_maindata;
     // Create sse signal
-    let count = sse_signal::<Count>("http://localhost:3010/sse");
-    view! {
-        <div>Count: {move || { view! { <span>{count.get().value.to_string()}</span>}}}</div>
-    }
-}
+    let data = sse_sync_maindata("http://localhost:3010/sse");
 
-#[derive(Clone, Default, Serialize, Deserialize)]
-pub struct Count {
-    pub value: i32,
+    view! {
+        <div>Count: {move || { view! { <div>
+            <div>"DL: "{data().server_state.dl_info_speed.to_string()}</div>
+            <div>"UP: "{data().server_state.up_info_speed.to_string()}</div>
+            <div>"Status: "{data().server_state.connection_status.to_string()}</div>
+            </div> }}}</div>
+    }
 }
