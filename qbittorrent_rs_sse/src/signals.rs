@@ -36,6 +36,8 @@ pub struct Torrent {
     pub upspeed: RwSignal<f64>,
     pub num_seeds: RwSignal<f64>,
     pub num_leechs: RwSignal<f64>,
+    pub size: RwSignal<f64>,
+    pub total_size: RwSignal<f64>,
 }
 
 impl From<TorrentInfo> for Torrent {
@@ -50,6 +52,8 @@ impl From<TorrentInfo> for Torrent {
             upspeed: RwSignal::new(value.upspeed),
             num_seeds: RwSignal::new(value.num_seeds),
             num_leechs: RwSignal::new(value.num_leechs),
+            size: RwSignal::new(value.size),
+            total_size: RwSignal::new(value.total_size),
         }
     }
 }
@@ -78,6 +82,12 @@ impl Torrent {
         }
         if let Some(new_value) = partial.num_leechs {
             self.num_leechs.set(new_value);
+        }
+        if let Some(new_value) = partial.size {
+            self.size.set(new_value);
+        }
+        if let Some(new_value) = partial.total_size {
+            self.total_size.set(new_value);
         }
     }
 }
