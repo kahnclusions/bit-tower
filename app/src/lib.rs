@@ -2,16 +2,17 @@ pub mod auth;
 mod routes;
 
 mod components;
+mod signals;
 
 use crate::error_template::{AppError, ErrorTemplate};
 
 use auth::{has_auth, Login};
-use components::status_bar::StatusBar;
+use components::{status_bar::StatusBar, torrents::TorrentList};
 use leptos::{either::Either, prelude::*};
 use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
 
-use fnord_ui::components::{Navbar, NavbarBrand};
+use fnord_ui::components::{Navbar, NavbarBrand, Text, View};
 use serde::{Deserialize, Serialize};
 
 pub mod error_template;
@@ -52,7 +53,7 @@ pub fn App() -> impl IntoView {
         // content for this welcome page
         <Router>
             <Navbar>
-                <NavbarBrand class="font-display">"bit-tower"</NavbarBrand>
+                <NavbarBrand class="font-display text-green1">"bit-tower"</NavbarBrand>
                 <ul class="p-2 font-cubic">
                     <A href="/login">login</A>
                 </ul>
@@ -119,12 +120,16 @@ fn Dashboard() -> impl IntoView {
     // Create sse signal
     let data = sse_sync_maindata("/sse");
     let server_data = data.clone();
+    let torrents = Signal::derive(move || {
+        let v: Vec<_> = data().torrents.into_iter().map(|(h, v)| v).collect();
+        v
+    });
     let server_state = Signal::derive(move || server_data().server_state);
 
     view! {
-        <div>
-        <div>"Torrent list will go here"</div>
-        <StatusBar server_state=server_state />
-        </div>
+        <View>
+        {move || view! {<TorrentList torrents=torrents />}}
+        {move || view! {<StatusBar server_state=server_state() />}}
+        </View>
     }
 }

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub enum TorrentStatus {
     #[serde(rename = "error")]
     /// Some error occurred, applies to paused torrents
@@ -74,6 +74,7 @@ pub enum TorrentStatus {
     /// Torrent is moving to another location
     Moving,
 
+    #[default]
     #[serde(rename = "unknown")]
     /// Unknown status
     Unknown,
@@ -95,7 +96,7 @@ pub struct TorrentSummaryPartial {
     pub state: Option<TorrentStatus>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq)]
 pub struct TorrentInfo {
     pub added_on: f64,     // Time (Unix Epoch) when the torrent was added to the client
     pub amount_left: f64,  // Amount of data left to download (bytes)
@@ -142,4 +143,53 @@ pub struct TorrentInfo {
     pub uploaded: f64,   // Amount of data uploaded
     pub uploaded_session: f64, // Amount of data uploaded this session
     pub upspeed: f64,    // Torrent upload speed (bytes/s)
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq)]
+pub struct TorrentInfoPartial {
+    pub added_on: Option<f64>, // Time (Unix Epoch) when the torrent was added to the client
+    pub amount_left: Option<f64>, // Amount of data left to download (bytes)
+    pub auto_tmm: Option<bool>, // Whether this torrent is managed by Automatic Torrent Management
+    pub availability: Option<f64>, // Percentage of file pieces currently available
+    pub category: Option<String>, // Category of the torrent
+    pub completed: Option<f64>, // Amount of transfer data completed (bytes)
+    pub completion_on: Option<f64>, // Time (Unix Epoch) when the torrent completed
+    pub content_path: Option<String>, // Absolute path of torrent content (root path for multifile torrents, absolute file path for singlefile torrents)
+    pub dl_limit: Option<f64>,        // Torrent download speed limit (bytes/s). -1 if unlimited.
+    pub dlspeed: Option<f64>,         // Torrent download speed (bytes/s)
+    pub downloaded: Option<f64>,      // Amount of data downloaded
+    pub downloaded_session: Option<f64>, // Amount of data downloaded this session
+    pub eta: Option<f64>,             // Torrent ETA (seconds)
+    pub infohash_v1: Option<String>,  // Torrent hash
+    pub f_l_piece_prio: Option<bool>, // True if first last piece are prioritized
+    pub force_start: Option<bool>,    // True if force start is enabled for this torrent
+    pub last_activity: Option<f64>,   // Last time (Unix Epoch) when a chunk was downloaded/uploaded
+    pub magnet_uri: Option<String>,   // Magnet URI corresponding to this torrent
+    pub max_ratio: Option<f64>, // Maximum share ratio until torrent is stopped from seeding/uploading
+    pub max_seeding_time: Option<f64>, // Maximum seeding time (seconds) until torrent is stopped from seeding
+    pub name: Option<String>,          // Torrent name
+    pub num_complete: Option<f64>,     // Number of seeds in the swarm
+    pub num_incomplete: Option<f64>,   // Number of leechers in the swarm
+    pub num_leechs: Option<f64>,       // Number of leechers connected to
+    pub num_seeds: Option<f64>,        // Number of seeds connected to
+    pub priority: Option<f64>, // Torrent priority. Returns -1 if queuing is disabled or torrent is in seed mode
+    pub progress: Option<f64>, // Torrent progress (percentage/100)
+    pub ratio: Option<f64>,    // Torrent share ratio. Max ratio value: 9999.
+    pub ratio_limit: Option<f64>, // TODO (what is different from max_ratio?)
+    pub save_path: Option<String>, // Path where this torrent's data is stored
+    pub seeding_time: Option<f64>, // Torrent elapsed time while complete (seconds)
+    pub seeding_time_limit: Option<f64>, // TODO (what is different from max_seeding_time?) seeding_time_limit is a per torrent setting, when Automatic Torrent Management is disabled, furthermore then max_seeding_time is set to seeding_time_limit for this torrent. If Automatic Torrent Management is enabled, the value is -2. And if max_seeding_time is unset it has a default value -1.
+    pub seen_complete: Option<f64>, // Time (Unix Epoch) when this torrent was last seen complete
+    pub seq_dl: Option<bool>,       // True if sequential download is enabled
+    pub size: Option<f64>,          // Total size (bytes) of files selected for download
+    pub state: Option<TorrentStatus>, // Torrent state. See table here below for the possible values
+    pub super_seeding: Option<bool>, // True if super seeding is enabled
+    pub tags: Option<String>,       // Comma-concatenated tag list of the torrent
+    pub time_active: Option<f64>,   // Total active time (seconds)
+    pub total_size: Option<f64>, // Total size (bytes) of all file in this torrent (including unselected ones)
+    pub tracker: Option<String>, // The first tracker with working status. Returns empty string if no tracker is working.
+    pub up_limit: Option<f64>,   // Torrent upload speed limit (bytes/s). -1 if unlimited.
+    pub uploaded: Option<f64>,   // Amount of data uploaded
+    pub uploaded_session: Option<f64>, // Amount of data uploaded this session
+    pub upspeed: Option<f64>,    // Torrent upload speed (bytes/s)
 }

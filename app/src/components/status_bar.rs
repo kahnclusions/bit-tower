@@ -3,13 +3,14 @@ use human_bytes::human_bytes;
 use leptos::prelude::*;
 
 use qbittorrent_rs_proto::transfer::ServerStateFull;
+use qbittorrent_rs_sse::signals::ServerState;
 
 #[component]
-pub fn StatusBar(server_state: Signal<ServerStateFull>) -> impl IntoView {
-    let dl_speed = move || human_bytes(server_state.get().dl_info_speed);
-    let up_speed = move || human_bytes(server_state.get().up_info_speed);
-    let dl_data = move || human_bytes(server_state.get().dl_info_data);
-    let up_data = move || human_bytes(server_state.get().up_info_data);
+pub fn StatusBar(server_state: ServerState) -> impl IntoView {
+    let dl_speed = move || human_bytes(server_state.dl_info_speed.get());
+    let up_speed = move || human_bytes(server_state.up_info_speed.get());
+    let dl_data = move || human_bytes(server_state.dl_info_data.get());
+    let up_data = move || human_bytes(server_state.up_info_data.get());
 
     view! {
         <View class="flex-row bg-background-highlight justify-between fixed bottom-0 left-0 right-0 h-10 text-sm">

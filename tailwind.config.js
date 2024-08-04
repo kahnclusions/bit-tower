@@ -15,6 +15,10 @@ module.exports = {
       roca: ["Roca"],
     },
     extend: {
+      boxShadow: {
+        border:
+          "inset 0 -1px 0 0 hsl(var(--grey)), inset -1px 0 0 0 hsl(var(--grey))",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -51,6 +55,10 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        green1: "hsl(var(--green-1))",
+        green2: "hsl(var(--green-2))",
+        green3: "hsl(var(--green-3))",
+        grey: "hsl(var(--grey))",
       },
     },
   },

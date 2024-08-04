@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::torrents::{TorrentInfo, TorrentInfoPartial};
+
 use super::{
     torrents::{TorrentSummary, TorrentSummaryPartial},
     transfer::{ServerStateFull, ServerStatePartial},
@@ -11,7 +13,7 @@ use super::{
 pub struct SyncMainDataFull {
     pub full_update: bool,
     pub rid: u64,
-    pub torrents: HashMap<String, TorrentSummary>,
+    pub torrents: HashMap<String, TorrentInfo>,
     pub server_state: ServerStateFull,
 }
 
@@ -27,7 +29,7 @@ impl SyncMainDataFull {
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SyncMainDataPartial {
     pub rid: u64,
-    pub torrents: Option<HashMap<String, TorrentSummaryPartial>>,
+    pub torrents: Option<HashMap<String, TorrentInfoPartial>>,
     pub server_state: Option<ServerStatePartial>,
 }
 

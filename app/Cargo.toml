@@ -30,6 +30,8 @@ bincode      = { version = "1.3.3", optional = true }
 base64       = { version = "0.22.1", optional = true }
 anyhow.workspace = true
 human_bytes = "0.4.3"
+tailwind_fuse.workspace = true
+rust_decimal = "1.35.0"
 
 
 [features]

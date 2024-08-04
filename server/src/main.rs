@@ -20,6 +20,10 @@ use leptos_axum::{
     AxumRouteListing, LeptosRoutes,
 };
 use qbittorrent_rs::QbtClient;
+use tower_http::compression::{
+    predicate::{NotForContentType, SizeAbove},
+    CompressionLayer, CompressionLevel, Predicate,
+};
 
 pub mod fileserv;
 
@@ -55,6 +59,14 @@ async fn main() {
         routes: routes.clone(),
     };
 
+    let predicate = SizeAbove::new(1500) // files smaller than 1501 bytes are not compressed, since the MTU (Maximum Transmission Unit) of a TCP packet is 1500 bytes
+        .and(NotForContentType::GRPC)
+        .and(NotForContentType::IMAGES)
+        // prevent compressing assets that are already statically compressed
+        .and(NotForContentType::const_new("application/javascript"))
+        .and(NotForContentType::const_new("application/wasm"))
+        .and(NotForContentType::const_new("text/css"));
+
     // build our application with a route
     let app = Router::new()
         .route(
@@ -63,6 +75,11 @@ async fn main() {
         )
         .route("/sse", get(handle_sse))
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
+        .layer(
+            CompressionLayer::new()
+                .quality(CompressionLevel::Fastest)
+                .compress_when(predicate),
+        )
         .fallback(file_and_error_handler)
         .layer(middleware::from_fn(session_middleware))
         .with_state(app_state);

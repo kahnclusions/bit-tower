@@ -128,9 +128,9 @@ html, body {
  
   @media (prefers-color-scheme: dark) {
     :root {
-      --background: 230 24% 19%;
+      --background: 235 18.75% 12.55%;
+      --background-dark: 240 15.38% 10.2%; 
       --background-highlight: 228 23% 21%; 
-      --background-dark: 229 26% 16%;
       --foreground: 229 73% 86%;
    
       --muted: 223 47% 11%;
@@ -164,6 +164,8 @@ html, body {
       --green-1: 89 51% 61%;
       --green-2: 171 58% 65%;
       --green-3: 188 47% 48%;
+
+      --grey: 229.41 22.87% 43.73%;
     }
   }
 }
