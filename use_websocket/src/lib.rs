@@ -287,19 +287,31 @@ where
 
     let (ready_state, set_ready_state) = signal(ConnectionReadyState::Closed);
     let (message, set_message) = signal(None);
-    let ws_ref: StoredValue<Option<WebSocket>, _> = StoredValue::new_local(None);
 
-    let reconnect_timer_ref: StoredValue<Option<TimeoutHandle>> = StoredValue::new(None);
-
-    let reconnect_times_ref: StoredValue<u64> = StoredValue::new(0);
-    let manually_closed_ref: StoredValue<bool> = StoredValue::new(false);
-
-    let unmounted = Arc::new(AtomicBool::new(false));
-
-    let connect_ref: StoredValue<Option<Arc<dyn Fn() + Send + Sync>>> = StoredValue::new(None);
+    #[cfg(feature = "ssr")]
+    {
+        return UseWebSocketReturn {
+            ready_state: ready_state.into(),
+            message: message.into(),
+            open: || {},
+            close: || {},
+            send: |_| {},
+        };
+    }
 
     #[cfg(not(feature = "ssr"))]
     {
+        let ws_ref: StoredValue<Option<WebSocket>, _> = StoredValue::new_local(None);
+
+        let reconnect_timer_ref: StoredValue<Option<TimeoutHandle>> = StoredValue::new(None);
+
+        let reconnect_times_ref: StoredValue<u64> = StoredValue::new(0);
+        let manually_closed_ref: StoredValue<bool> = StoredValue::new(false);
+
+        let unmounted = Arc::new(AtomicBool::new(false));
+
+        let connect_ref: StoredValue<Option<Arc<dyn Fn() + Send + Sync>>> = StoredValue::new(None);
+
         let reconnect_ref: StoredValue<Option<Arc<dyn Fn() + Send + Sync>>> =
             StoredValue::new(None);
         reconnect_ref.set_value({
@@ -529,86 +541,85 @@ where
                 ws_ref.set_value(Some(web_socket));
             }))
         });
-    }
 
-    // Send text (String)
-    let send_str = {
-        Box::new(move |data: &str| {
+        // Send text (String)
+        let send_str = {
+            Box::new(move |data: &str| {
+                if ready_state.get_untracked() == ConnectionReadyState::Open {
+                    if let Some(web_socket) = ws_ref.get_value() {
+                        let _ = web_socket.send_with_str(data);
+                    }
+                }
+            })
+        };
+
+        // Send bytes
+        let send_bytes = move |data: &[u8]| {
             if ready_state.get_untracked() == ConnectionReadyState::Open {
                 if let Some(web_socket) = ws_ref.get_value() {
-                    let _ = web_socket.send_with_str(data);
+                    let _ = web_socket.send_with_u8_array(data);
                 }
             }
-        })
-    };
+        };
 
-    // Send bytes
-    let send_bytes = move |data: &[u8]| {
-        if ready_state.get_untracked() == ConnectionReadyState::Open {
-            if let Some(web_socket) = ws_ref.get_value() {
-                let _ = web_socket.send_with_u8_array(data);
-            }
-        }
-    };
+        let send = {
+            let on_error = Arc::clone(&on_error);
 
-    let send = {
-        let on_error = Arc::clone(&on_error);
-
-        move |value: &T| {
-            if C::is_binary() {
-                match C::encode_bin(value) {
-                    Ok(val) => send_bytes(&val),
-                    Err(err) => on_error(CodecError::Encode(err).into()),
-                }
-            } else {
-                match C::encode_str(value) {
-                    Ok(val) => send_str(&val),
-                    Err(err) => on_error(CodecError::Encode(err).into()),
+            move |value: &T| {
+                if C::is_binary() {
+                    match C::encode_bin(value) {
+                        Ok(val) => send_bytes(&val),
+                        Err(err) => on_error(CodecError::Encode(err).into()),
+                    }
+                } else {
+                    match C::encode_str(value) {
+                        Ok(val) => send_str(&val),
+                        Err(err) => on_error(CodecError::Encode(err).into()),
+                    }
                 }
             }
-        }
-    };
+        };
 
-    // Open connection
-    let open = move || {
-        reconnect_times_ref.set_value(0);
-        if let Some(connect) = connect_ref.get_value() {
-            connect();
-        }
-    };
-
-    // Close connection
-    let close = {
-        reconnect_timer_ref.set_value(None);
-
-        move || {
-            manually_closed_ref.set_value(true);
-            if let Some(web_socket) = ws_ref.get_value() {
-                let _ = web_socket.close();
+        // Open connection
+        let open = move || {
+            reconnect_times_ref.set_value(0);
+            if let Some(connect) = connect_ref.get_value() {
+                connect();
             }
-        }
-    };
+        };
 
-    // Open connection (not called if option `manual` is true)
-    Effect::new(move |_| {
-        if immediate {
-            open();
-        }
-    });
+        // Close connection
+        let close = {
+            reconnect_timer_ref.set_value(None);
 
-    // clean up (unmount)
-    on_cleanup(move || {
-        unmounted.store(true, std::sync::atomic::Ordering::Relaxed);
-        close();
-    });
+            move || {
+                manually_closed_ref.set_value(true);
+                if let Some(web_socket) = ws_ref.get_value() {
+                    let _ = web_socket.close();
+                }
+            }
+        };
 
-    UseWebSocketReturn {
-        ready_state: ready_state.into(),
-        message: message.into(),
-        ws: ws_ref.get_value(),
-        open,
-        close,
-        send,
+        // Open connection (not called if option `manual` is true)
+        Effect::new(move |_| {
+            if immediate {
+                open();
+            }
+        });
+
+        // clean up (unmount)
+        on_cleanup(move || {
+            unmounted.store(true, std::sync::atomic::Ordering::Relaxed);
+            close();
+        });
+
+        return UseWebSocketReturn {
+            ready_state: ready_state.into(),
+            message: message.into(),
+            open,
+            close,
+            send,
+        };
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -722,7 +733,7 @@ where
     /// Latest message received from `WebSocket`.
     pub message: Signal<Option<T>>,
     /// The `WebSocket` instance.
-    pub ws: Option<WebSocket>,
+    // pub ws: Option<WebSocket>,
     /// Opens the `WebSocket` connection
     pub open: OpenFn,
     /// Closes the `WebSocket` connection

@@ -7,7 +7,6 @@ use qbittorrent_rs_proto::transfer::ServerStateFull;
 
 #[component]
 pub fn StatusBar(server_state: ServerState) -> impl IntoView {
-    tracing::info!("updating with new server_state");
     let dl_speed = move || human_bytes(server_state.dl_info_speed.get());
     let up_speed = move || human_bytes(server_state.up_info_speed.get());
     let dl_data = move || human_bytes(server_state.dl_info_data.get());

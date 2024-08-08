@@ -8,19 +8,15 @@ mod signals;
 
 use crate::error_template::{AppError, ErrorTemplate};
 use auth::{has_auth, Login};
-use codee::binary::MsgpackSerdeCodec;
 use components::{status_bar::StatusBar, torrents::TorrentList};
 use leptos::{either::Either, prelude::*};
 use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
 
 use fnord_ui::components::{Navbar, NavbarBrand, Text, View};
-use qbittorrent_rs_proto::sync::MainData;
 use serde::{Deserialize, Serialize};
 use signals::syncstate::{ServerState, SyncState, Torrent};
 use signals::use_sync_maindata::{use_sync_maindata, UseSyncMaindataReturn};
-use use_websocket::core::ConnectionReadyState;
-use use_websocket::{use_websocket, UseWebSocketReturn};
 
 pub mod error_template;
 
@@ -51,56 +47,6 @@ pub fn App() -> impl IntoView {
     let is_auth = Resource::new(move || login.version(), move |_| has_auth());
     let auth = Signal::derive(move || is_auth.get().map(|v| v.unwrap_or(false)).unwrap_or(false));
 
-    // let UseSyncMaindataReturn {
-    //     connected, data, ..
-    // } = use_sync_maindata("wss://local.ck.dev/ws");
-
-    let (data, set_data) = signal(SyncState::default());
-
-    let UseWebSocketReturn {
-        ready_state,
-        message,
-        ..
-    } = use_websocket::<MainData, MsgpackSerdeCodec>("wss://local.ck.dev/ws");
-
-    let connected = Signal::derive(move || ready_state.get() == ConnectionReadyState::Open);
-
-    Effect::new(move |_| {
-        message.with(|message| {
-            if let Some(m) = message {
-                match m {
-                    MainData::Full(full_data) => set_data.set(SyncState::from(full_data)),
-                    MainData::Partial(partial_data) => {
-                        data.with(|data| {
-                            let torrents = partial_data.clone().torrents;
-                            if let Some(torrents) = torrents {
-                                for (hash, partial) in torrents {
-                                    data.torrents
-                                        .get(&hash)
-                                        .map(|torrent| torrent.apply_partial(partial));
-                                }
-                            }
-                            if let Some(server_state) = partial_data.clone().server_state {
-                                data.server_state.apply_partial(server_state);
-                            }
-                        });
-                    }
-                }
-            }
-        });
-    });
-
-    let status = move || {
-        if connected.get() {
-            "Connected"
-        } else {
-            "Disconnected"
-        }
-    };
-
-    Effect::new(move |_| {
-        tracing::info!("Status = {}", status());
-    });
     // let torrents = Signal::derive(move || {
     //     let v: Vec<_> = data().torrents.into_iter().map(|(_h, v)| v).collect();
     //     v
@@ -115,7 +61,7 @@ pub fn App() -> impl IntoView {
 
         // content for this welcome page
         <Router>
-            <Navbar>
+            <Navbar class="z-50">
                 <NavbarBrand class="font-display text-green1">"bit-tower"</NavbarBrand>
                 <ul class="p-2 font-cubic">
                     <A href="/login">login</A>
@@ -128,7 +74,29 @@ pub fn App() -> impl IntoView {
             outside_errors.insert_with_default_key(AppError::NotFound);
             view! { <ErrorTemplate outside_errors/> }.into_view()
         }>
-                    <Route path=StaticSegment("") view=move || view! { <HomePage is_auth=auth action=login data=data /> } />
+                    <Route path=StaticSegment("") view=move || {
+    let UseSyncMaindataReturn {
+        connected, data, ..
+    } = use_sync_maindata("wss://local.ck.dev/ws");
+
+    let status = move || {
+        if connected.get() {
+            "Connected"
+        } else {
+            "Disconnected"
+        }
+    };
+
+    Effect::new(move |_| {
+        tracing::info!("Status = {}", status());
+    });
+
+            view! {
+
+
+                        <HomePage is_auth=auth action=login data=data />
+
+                    }} />
                 </FlatRoutes>
             </main>
         </Router>

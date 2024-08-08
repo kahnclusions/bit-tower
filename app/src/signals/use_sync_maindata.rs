@@ -1,6 +1,9 @@
 use leptos::prelude::*;
 use qbittorrent_rs_proto::sync::MainData;
-use use_websocket::{core::ConnectionReadyState, use_websocket, UseWebSocketReturn};
+use use_websocket::{
+    core::ConnectionReadyState, use_websocket, use_websocket_with_options, UseWebSocketError,
+    UseWebSocketOptions, UseWebSocketReturn,
+};
 
 use codee::binary::MsgpackSerdeCodec;
 
@@ -26,13 +29,15 @@ pub fn use_sync_maindata(
 ) -> UseSyncMaindataReturn<impl Fn() + Clone + 'static, impl Fn() + Clone + 'static> {
     let (data, set_data) = signal(SyncState::default());
 
+    let opts = UseWebSocketOptions::default();
+
     let UseWebSocketReturn {
         ready_state,
         message,
         open,
         close,
         ..
-    } = use_websocket::<MainData, MsgpackSerdeCodec>(url);
+    } = use_websocket_with_options::<MainData, MsgpackSerdeCodec>(url, opts);
 
     let connected = Signal::derive(move || ready_state.get() == ConnectionReadyState::Open);
 

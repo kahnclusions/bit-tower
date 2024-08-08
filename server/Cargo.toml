@@ -13,7 +13,6 @@ tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["fmt"] }
 qbittorrent-rs = { path = "../qbittorrent_rs" }
 qbittorrent-rs-proto = { path = "../qbittorrent_rs_proto" }
-qbittorrent-rs-sse = { path = "../qbittorrent_rs_sse", features = ["ssr"] }
 
 anyhow.workspace = true
 axum = { version = "0.7", features = ["macros", "ws"]}

@@ -138,7 +138,6 @@ impl ServerState {
             self.connection_status.set(cs);
         }
         if let Some(v) = partial.dl_info_speed {
-            tracing::info!("speed = {}", v);
             self.dl_info_speed.set(v);
         }
         if let Some(v) = partial.up_info_speed {

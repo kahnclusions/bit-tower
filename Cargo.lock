@@ -1698,17 +1698,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "json-patch"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec9ad60d674508f3ca8f380a928cfe7b096bc729c4e2dbfe3852bc45da3ab30b"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2636,29 +2625,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "qbittorrent-rs-sse"
-version = "0.4.0"
-dependencies = [
- "anyhow",
- "axum",
- "cfg-if",
- "futures",
- "js-sys",
- "json-patch",
- "leptos 0.7.0-beta (registry+https://github.com/rust-lang/crates.io-index)",
- "pin-project-lite",
- "qbittorrent-rs",
- "qbittorrent-rs-proto",
- "serde",
- "serde_json",
- "tokio",
- "tokio-stream",
- "tracing",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3251,7 +3217,6 @@ dependencies = [
  "mime_guess",
  "qbittorrent-rs",
  "qbittorrent-rs-proto",
- "qbittorrent-rs-sse",
  "rmp-serde",
  "rust-embed",
  "serde",
