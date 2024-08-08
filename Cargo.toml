@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["app", "frontend", "server", "fnord_ui", "qbittorrent_rs", "qbittorrent_rs_proto", "qbittorrent_rs_sse"]
+members = ["app", "frontend", "server", "fnord_ui", "qbittorrent_rs", "qbittorrent_rs_proto", "use_websocket"]
 
 # need to be applied only to wasm build
 [profile.release]
@@ -14,7 +14,6 @@ leptos_meta = { version = "0.7.0-beta" }
 leptos_router = { version = "0.7.0-beta", features = ["nightly"] }
 leptos_axum = { version = "0.7.0-beta" }
 
-axum = {version = "0.7", features = ["macros"]}
 anyhow = { version = "1.0.86", features = ["backtrace"] }
 cfg-if = "1"
 chrono = { version = "0.4.38", features = ["serde"] }

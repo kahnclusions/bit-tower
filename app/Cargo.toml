@@ -10,6 +10,7 @@ leptos.workspace = true
 leptos_meta.workspace = true
 leptos_router.workspace = true
 leptos_axum = { workspace = true, optional = true }
+leptos-use  = { git = "https://github.com/Synphonyte/leptos-use", branch = "leptos-0.7" }
 
 http.workspace = true
 cfg-if.workspace = true
@@ -24,7 +25,6 @@ wasm-bindgen-futures = { version = "0.4.42", optional = true }
 fnord-ui = { path = "../fnord_ui", default-features = false, optional = true }
 qbittorrent-rs = { path = "../qbittorrent_rs", optional = true }
 qbittorrent-rs-proto = { path = "../qbittorrent_rs_proto" }
-qbittorrent-rs-sse = { path = "../qbittorrent_rs_sse" }
 simple_crypt = { version = "0.2.3", optional = true }
 bincode      = { version = "1.3.3", optional = true }
 base64       = { version = "0.22.1", optional = true }
@@ -32,10 +32,13 @@ anyhow.workspace = true
 human_bytes = "0.4.3"
 tailwind_fuse.workspace = true
 rust_decimal = "1.35.0"
+use_websocket = { path = "../use_websocket", optional = true }
+codee = { version = "0.1.2", features = ["msgpack_serde"] }
+web-sys = "0.3.69"
 
 
 [features]
 default = []
-hydrate = ["leptos/hydrate", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "fnord-ui/hydrate"]
-ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum", "dep:simple_crypt", "dep:bincode", "dep:base64", "fnord-ui/ssr", "qbittorrent-rs"]
+hydrate = ["leptos/hydrate", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "fnord-ui/hydrate", "use_websocket/hydrate"]
+ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum", "dep:simple_crypt", "dep:bincode", "dep:base64", "fnord-ui/ssr", "qbittorrent-rs", "use_websocket/ssr"]
 

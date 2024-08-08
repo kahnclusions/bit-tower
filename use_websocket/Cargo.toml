@@ -1,0 +1,34 @@
+[package]
+name = "use_websocket"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+leptos.workspace = true
+leptos_meta.workspace = true
+leptos_router.workspace = true
+leptos_axum = { workspace = true, optional = true }
+
+http.workspace = true
+cfg-if.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+wasm-bindgen = { version = "0.2"}
+wasm-bindgen-futures = { version = "0.4.42" }
+
+anyhow.workspace = true
+codee = { version = "0.1.2", features = ["msgpack_serde"] }
+web-sys = "0.3.69"
+js-sys = "0.3.69"
+default-struct-builder = "0.5"
+
+[features]
+default = []
+ssr = []
+hydrate = ["leptos/hydrate"]
+

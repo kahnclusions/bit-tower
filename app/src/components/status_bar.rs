@@ -2,11 +2,12 @@ use fnord_ui::components::{Text, View};
 use human_bytes::human_bytes;
 use leptos::prelude::*;
 
+use crate::signals::syncstate::ServerState;
 use qbittorrent_rs_proto::transfer::ServerStateFull;
-use qbittorrent_rs_sse::signals::ServerState;
 
 #[component]
 pub fn StatusBar(server_state: ServerState) -> impl IntoView {
+    tracing::info!("updating with new server_state");
     let dl_speed = move || human_bytes(server_state.dl_info_speed.get());
     let up_speed = move || human_bytes(server_state.up_info_speed.get());
     let dl_data = move || human_bytes(server_state.dl_info_data.get());

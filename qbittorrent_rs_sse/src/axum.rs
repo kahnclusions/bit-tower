@@ -17,7 +17,7 @@ pub async fn handle_sse(
         let qbt = qbt.clone();
         let sid = sid.clone();
         async move {
-            let res = qbt.sync_maindata(sid, state).await;
+            let res = qbt.sync_maindata(sid.as_str(), state).await;
 
             let Ok(maindata) = res else {
                 tracing::error!("Oops, the thing went boom.");

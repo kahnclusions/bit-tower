@@ -2,9 +2,9 @@ use human_bytes::human_bytes;
 use rust_decimal::prelude::*;
 use tailwind_fuse::tw_merge;
 
+use crate::signals::syncstate::Torrent;
 use fnord_ui::components::{Text, View};
 use leptos::prelude::*;
-use qbittorrent_rs_sse::signals::Torrent;
 
 static CELL_CLASS: &'static str = "shadow-border p-2 whitespace-nowrap text-left font-normal";
 
@@ -40,15 +40,16 @@ pub fn TorrentList(torrents: Signal<Vec<Torrent>>) -> impl IntoView {
 #[component]
 pub fn TorrentSummary(torrent: Torrent) -> impl IntoView {
     let name = move || torrent.name.get();
+    let torrent_progress = torrent.progress.clone();
     let progress = move || {
-        Decimal::from_str(format!("{:.2}", torrent.progress.get() * 100.0).as_str())
+        Decimal::from_str(format!("{:.2}", torrent_progress.get() * 100.0).as_str())
             .unwrap()
             .normalize()
             .to_string()
     };
 
-    let downloaded = move || human_bytes(torrent.downloaded.get());
-    let uploaded = move || human_bytes(torrent.downloaded.get());
+    // let downloaded = move || human_bytes(torrent.downloaded.get());
+    // let uploaded = move || human_bytes(torrent.downloaded.get());
     let dlspeed = move || human_bytes(torrent.dlspeed.get());
     let upspeed = move || human_bytes(torrent.upspeed.get());
 
@@ -66,25 +67,22 @@ pub fn TorrentSummary(torrent: Torrent) -> impl IntoView {
 
 #[component]
 fn Progress(
-    downloaded: RwSignal<f64>,
-    progress: RwSignal<f64>,
-    size: RwSignal<f64>,
-    total_size: RwSignal<f64>,
+    downloaded: ArcRwSignal<f64>,
+    progress: ArcRwSignal<f64>,
+    size: ArcRwSignal<f64>,
+    total_size: ArcRwSignal<f64>,
 ) -> impl IntoView {
-    let percent_selected = move || size.get() / total_size.get();
-    let inner_bar_w = move || (percent_selected() * 150.0).ceil();
-    let percent_complete =
-        move || (progress.get().min(1.0) * percent_selected().min(1.0) * 150.0) - 8.0;
-
-    Effect::new(move |_| {
-        tracing::info!("percent = {:?}", progress.get());
-    });
+    let total = total_size.clone();
+    let percent_selected = move || size.get() / total.get();
+    let inner_bar_w = move || (percent_selected().min(1.0) * 150.0).ceil();
+    let inner_bar_w2 = inner_bar_w.clone();
+    let percent_complete = move || (progress.get().min(1.0) * inner_bar_w()) - 8.0;
 
     view! {
         <div class="flex flex-col w-[150px] gap-[2px]">
             <div class="rounded bg-background_dark h-2">
-                <div class="rounded bg-background_highlight h-2" style:width=move || { format!("{}px", inner_bar_w()) }>
-                    <div class="border-t-[2px] border-t-green1 relative top-[3px] left-[4px]" style:width=move || { format!("{}%", (progress.get().min(1.0) * 100.0).ceil()) }>""</div>
+                <div class="rounded bg-background_highlight h-2" style:width=move || { format!("{}px", inner_bar_w2()) }>
+                    <div class="border-t-[2px] border-t-green1 relative top-[3px] left-[4px]" style:width=move || { format!("{}px", (percent_complete().ceil().max(0.0))) }>""</div>
                 </div>
             </div>
             <div class="flex flex-row justify-between text-2xs">

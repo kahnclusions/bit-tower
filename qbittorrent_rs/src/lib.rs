@@ -33,7 +33,7 @@ impl QbtClient {
     }
 
     #[tracing::instrument]
-    async fn get(&self, sid: String, path: String) -> Result<Response, reqwest::Error> {
+    async fn get(&self, sid: &str, path: String) -> Result<Response, reqwest::Error> {
         let url = format!("{}{}", self.base_url, path);
         let client = reqwest::Client::builder().build()?;
 
@@ -66,7 +66,7 @@ impl QbtClient {
     }
 
     #[tracing::instrument]
-    pub async fn torrents_info(&self, sid: String) -> Result<Vec<TorrentSummary>, QbtError> {
+    pub async fn torrents_info(&self, sid: &str) -> Result<Vec<TorrentSummary>, QbtError> {
         let url = format!("{}{}", TORRENTS_API, INFO_API);
         let response = self.get(sid, url);
 
@@ -74,7 +74,7 @@ impl QbtClient {
     }
 
     #[tracing::instrument]
-    pub async fn sync_maindata(&self, sid: String, rid: u64) -> Result<MainData, QbtError> {
+    pub async fn sync_maindata(&self, sid: &str, rid: u64) -> Result<MainData, QbtError> {
         let url = format!("{}{}{}?rid={}", self.base_url, SYNC_API, MAINDATA_API, rid);
         let client = reqwest::Client::builder().build()?;
 
