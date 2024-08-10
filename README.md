@@ -1,6 +1,6 @@
 # 🗼 bit-tower
 
-`bit-tower` is a self-hosted open-source web frontend for QBitTorrent, optimised for mobile devices.
+`bit-tower` is a self-hosted open-source web frontend for QBitTorrent, optimised for mobile devices, written in Rust. The web app is a Leptos full-stack app using `wasm-bindgen` in the browser and served with `axum`.
 
 WARNING: Currently in early development, not ready for use.
 
