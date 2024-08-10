@@ -51,6 +51,8 @@ pub struct Torrent {
     pub num_leechs: ArcRwSignal<f64>,
     pub size: ArcRwSignal<f64>,
     pub total_size: ArcRwSignal<f64>,
+    pub availability: ArcRwSignal<f64>,
+    pub eta: ArcRwSignal<f64>,
 }
 
 impl From<TorrentInfo> for Torrent {
@@ -67,6 +69,8 @@ impl From<TorrentInfo> for Torrent {
             num_leechs: ArcRwSignal::new(value.num_leechs),
             size: ArcRwSignal::new(value.size),
             total_size: ArcRwSignal::new(value.total_size),
+            availability: ArcRwSignal::new(value.availability),
+            eta: ArcRwSignal::new(value.eta),
         }
     }
 }
@@ -101,6 +105,12 @@ impl Torrent {
         }
         if let Some(new_value) = partial.total_size {
             self.total_size.set(new_value);
+        }
+        if let Some(new_value) = partial.availability {
+            self.availability.set(new_value);
+        }
+        if let Some(new_value) = partial.eta {
+            self.eta.set(new_value);
         }
     }
 }

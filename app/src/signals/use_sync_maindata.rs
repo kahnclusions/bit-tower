@@ -18,6 +18,7 @@ where
     OpenFn: Fn() + Clone + 'static,
     CloseFn: Fn() + Clone + 'static,
 {
+    pub ready_state: Signal<ConnectionReadyState>,
     pub connected: Signal<bool>,
     pub data: ReadSignal<SyncState>,
     pub open: OpenFn,
@@ -67,6 +68,7 @@ pub fn use_sync_maindata(
     });
 
     UseSyncMaindataReturn {
+        ready_state,
         connected,
         data,
         open,

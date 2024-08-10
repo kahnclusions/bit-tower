@@ -6,6 +6,7 @@ module.exports = {
     fontFamily: {
       sans: ["InterVariable", "sans-serif"],
       serif: ["Playfair", "Georgia"],
+      iosevka: ["Iosevka", "monospace"],
       display: ["Silkscreen"],
       cubic: ["Cubic"],
       pressstart: ["PressStart"],

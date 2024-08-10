@@ -87,7 +87,13 @@ html, body {
     font-display: swap;
     src: url("/fonts/rocaone-rg-webfont.woff2") format("woff2");
   }
-
+  @font-face {
+    font-family: Iosevka;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Iosevka/Iosevka-Regular.woff2") format("woff2");
+  }
 }
 
 @layer base {
@@ -165,7 +171,7 @@ html, body {
       --green-2: 171 58% 65%;
       --green-3: 188 47% 48%;
 
-      --grey: 229.41 22.87% 43.73%;
+      --grey: 217 19% 27%;
     }
   }
 }

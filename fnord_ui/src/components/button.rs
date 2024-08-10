@@ -78,23 +78,24 @@ pub fn Button(
         })
     } else {
         Either::Right(view! {
-                <button
-                    id=id
-                    type=html_type
-                    class=tw_merge!(common, variants.to_class(), class)
-                    disabled=move || { pending() || disabled() }
-                >
-                    <Show
-                        when=move || !pending()
-                        fallback=|| {
-                            view! {
-                                <div class="loader-small border-white border-b-[#aaa] dark:border-black"></div>
-                            }
+            <button
+                id=id
+                type=html_type
+                class=tw_merge!(common, variants.to_class(), class)
+                disabled=move || { pending() || disabled() }
+            >
+                <Show
+                    when=move || !pending()
+                    fallback=|| {
+                        view! {
+                            <div class="loader-small border-white border-b-[#aaa] dark:border-black"></div>
                         }
-                    >
-                        {children.with_value(|children| children())}
-                    </Show>
-                </button>
+                    }
+                >
+
+                    {children.with_value(|children| children())}
+                </Show>
+            </button>
         })
     }
 }
