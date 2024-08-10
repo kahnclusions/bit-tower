@@ -23,8 +23,8 @@ pub fn TorrentList(torrents: Signal<Vec<Torrent>>) -> impl IntoView {
                             CELL_CLASS
                         )>"Name"</th>
                         <th class=CELL_CLASS>"Progress"</th>
-                        <th class=tw_merge!(CELL_CLASS, "w-[90px]")>"DL/s"</th>
-                        <th class=tw_merge!(CELL_CLASS, "w-[90px]")>"UP/s"</th>
+                        <th class=CELL_CLASS><div class="w-[90px]">"DL/s"</div></th>
+                        <th class=CELL_CLASS><div class="w-[90px]">"UP/s"</div></th>
                         <th class=CELL_CLASS>"Seeds"</th>
                         <th class=CELL_CLASS>"Leechs"</th>
                         <th class=CELL_CLASS>"Eta"</th>

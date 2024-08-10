@@ -9,11 +9,14 @@ mod signals;
 use crate::error_template::{AppError, ErrorTemplate};
 use auth::{has_auth, Login};
 use components::{status_bar::StatusBar, torrents::TorrentList};
+use icondata as i;
+use leptos::text_prop::TextProp;
 use leptos::{either::Either, prelude::*};
+use leptos_icons::Icon;
 use leptos_meta::*;
 use leptos_router::{components::*, StaticSegment};
 
-use fnord_ui::components::{Navbar, NavbarBrand, Text, View};
+use fnord_ui::components::{Button, Navbar, NavbarBrand, Text, View};
 use serde::{Deserialize, Serialize};
 use signals::syncstate::{ServerState, SyncState, Torrent};
 use signals::use_sync_maindata::{use_sync_maindata, UseSyncMaindataReturn};
@@ -154,7 +157,18 @@ fn Dashboard(
     view! {
         <View>
             <TorrentList torrents=torrents/>
+            <MobileNavBar />
             {move || view! { <StatusBar server_state=data().server_state ready_state=ready_state /> }}
+        </View>
+    }
+}
+
+#[component]
+fn MobileNavBar() -> impl IntoView {
+    view! {
+        <View class="flex-row gap-0">
+            <Button><Icon icon=i::TbMagnet class=TextProp::from("w-4 w-4 text-grey-300") /></Button>
+            <Button><Icon icon=i::TbFileUpload class=TextProp::from("w-4 w-4 text-grey-300") /></Button>
         </View>
     }
 }
