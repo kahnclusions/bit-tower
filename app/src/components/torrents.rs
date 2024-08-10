@@ -97,9 +97,9 @@ fn Progress(
 
     view! {
         <div class="flex flex-col w-[110px] gap-[2px]">
-            <div class="rounded dark:bg-gray-900 h-2">
+            <div class="rounded bg-gray-100 dark:bg-gray-900 h-2">
                 <div
-                    class="rounded dark:bg-gray-800 h-2"
+                    class="rounded bg-gray-200 dark:bg-gray-800 h-2"
                     style:width=move || { format!("{}px", inner_bar_w2()) }
                 >
                     <div
