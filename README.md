@@ -4,6 +4,10 @@
 
 WARNING: Currently in early development, not ready for use.
 
+| light | dark |
+| ----- | ---- |
+| ![light mode](./public/preview-light.png) | ![dark mode](./public/preview-dark.png) |
+
 ## Packages
 
 This project is organised into a number of crates:
