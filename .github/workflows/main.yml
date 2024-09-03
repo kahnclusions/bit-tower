@@ -1,24 +1,18 @@
-name: Build and test
-
+name: "Build with Nix"
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    branches:
+      - 'main'
 env:
   CARGO_TERM_COLOR: always
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: "write"
+      contents: "read"
     steps:
-    - uses: actions/checkout@v4
-    - name: Install
-      run: cargo install cargo-leptos
-    - name: Build
-      run: cargo leptos build -vv
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix build
