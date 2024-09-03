@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   mode: "all",
-  content: ["./**/src/**/*.{rs,html,css}"],
+  content: ["./src/**/*.{rs,html,css}"],
   theme: {
     fontFamily: {
       sans: ["InterVariable", "sans-serif"],
